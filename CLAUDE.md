@@ -1,5 +1,9 @@
-# Claude Code 하네스 템플릿 — 지침 지도
+# PokerMemo AI — 지침 지도
 
+> PokerMemo AI (오프라인 토너먼트 포커 트래커): 글로벌 오프라인 토너먼트 포커 플레이어가 기록한 핸드 메모를 바탕으로,
+> AI 에이전트가 리크 분석 리포트 및 맞춤형 GTO/ICM 솔루션을 제공하는 서비스.
+> XPRIZE 해커톤(Deadline 2026-08-18) 제출 프로젝트 — 실제 매출/유저/AI 운영 증빙 필수.
+>
 > 이 파일은 ~100줄 지도입니다. 세부 규칙은 `docs/`에 있습니다.
 
 ---
@@ -105,3 +109,37 @@
 ├── logs/                      # gitignore 대상
 └── .env                       # gitignore 대상
 ```
+
+---
+
+## 프로젝트 맞춤 규칙
+
+> /init-project 에서 자동 생성됨. 이 프로젝트에만 적용됩니다.
+
+### Claude 행동 지침
+
+- 무조건 다크 모드(Dark Mode) 기반의 심플하고 직관적인 UI — Flutter 컴포넌트 구조 사용
+- 복잡한 포커 수학 수식·AI 프롬프트 로직 작성 시 초보자도 이해할 수 있도록 **한글 주석**을 상세히 달 것
+- 기존에 작동하던 코드 수정 시 구조를 깨뜨리지 말고 단계별로 리팩토링할 것
+- 모든 주요 기능(API 호출, 데이터 파싱 등)에 try-catch 예외 처리 코드를 반드시 포함할 것
+- UI/UX: Material 3 스펙 준수, 배경 Jet Black(#000000) + 포인트 컬러 Neon Green/Gold, 입력 폼·버튼은 한 손 조작 가능한 하단 배치 우선
+- 포커 도메인 용어(SB/BB/UTG/HJ/CO/BTN 등 포지션, ICM 변수명)는 정확히 구분해 데이터화 — 자세한 규칙 → [`agents/poker-agent.md`](agents/poker-agent.md)
+- XPRIZE 증빙: AI 에이전트(Vertex AI)가 주간 리포트를 발행할 때마다 분석 시작 시간·판단 근거·토큰 수·발행 결과 상태를 Firestore `agent_execution_logs` 컬렉션에 무조건 자동 기록
+- 상태 관리는 Provider 또는 Riverpod로 통일, 상태 관리 파일과 UI 화면 파일을 철저히 분리할 것
+
+### MVP 범위 제한
+
+> 아래 항목은 명시적 요청 없이 절대 구현하지 않습니다.
+
+- 자체 결제 모듈 시스템 구축 (Stripe 등 외부 PG사 구독 결제 링크로 대체)
+- 실시간 멀티플레이어 기능 (유저 간 핸드 공유, 소셜 피드, 커뮤니티)
+- 실시간 족보 계산기 (인게임 중 실시간 확률 표시 UI)
+
+### 기술 스택 고정
+
+- Frontend: Flutter (Dart) — 최신 안정판(stable) 기준, 특정 버전 고정 없음
+- Backend & DB: Firebase (Auth, Firestore, Cloud Functions)
+- AI & Infrastructure: Google Cloud Vertex AI / Gemini API — **Gemini Flash 계열**(비용 효율 우선)을
+  포스터 스캔·리크 분석·주간 리포트 생성에 기본 사용. 품질이 부족하면 Pro 계열로 부분 전환 검토
+- 결제 증빙: Stripe 결제 페이지 연동 (외부 링크 방식)
+- 다른 라이브러리/프레임워크 임의 도입 금지 — 변경 필요 시 항상 사용자에게 먼저 확인
