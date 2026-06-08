@@ -6,6 +6,11 @@ import 'package:poker_memo_ai/main.dart';
 import 'package:poker_memo_ai/core/theme/app_colors.dart';
 
 void main() {
+  setUpAll(() async {
+    // Flutter 플러그인 채널 초기화 — 네이티브 플러그인을 테스트 환경에서 호출할 때 필요
+    TestWidgetsFlutterBinding.ensureInitialized();
+  });
+
   testWidgets('홈 화면이 다크 모드 테마로 렌더링되는지 확인', (WidgetTester tester) async {
     // Riverpod Provider를 사용하므로 ProviderScope로 감싸서 렌더링
     await tester.pumpWidget(const ProviderScope(child: PokerMemoApp()));

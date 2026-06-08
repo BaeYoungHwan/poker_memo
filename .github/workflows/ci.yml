@@ -30,10 +30,12 @@ jobs:
         run: flutter test
 
   # ── 2. Cloud Functions TypeScript 빌드 ──────────────────────────────
+  # functions/package.json 이 없으면 잡 전체를 스킵
   functions-build:
     name: Cloud Functions TypeScript 빌드
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    if: hashFiles('functions/package.json') != ''
     defaults:
       run:
         working-directory: functions
@@ -43,8 +45,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: npm
-          cache-dependency-path: functions/package-lock.json
 
       - name: 의존성 설치
         run: npm ci
@@ -59,7 +59,13 @@ jobs:
     name: Firebase 배포
     runs-on: ubuntu-latest
     needs: [flutter-check, functions-build]
-    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    # functions-build 가 스킵된 경우에도 flutter-check 통과 시 배포 진행
+    if: |
+      always() &&
+      needs.flutter-check.result == 'success' &&
+      (needs.functions-build.result == 'success' || needs.functions-build.result == 'skipped') &&
+      github.ref == 'refs/heads/master' &&
+      github.event_name == 'push'
     steps:
       - uses: actions/checkout@v4
 
@@ -73,8 +79,15 @@ jobs:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
       - name: Functions 의존성 설치
+        if: hashFiles('functions/package.json') != ''
         working-directory: functions
         run: npm ci
 
       - name: Firebase 배포 (Functions + Firestore 규칙)
-        run: npx firebase-tools@latest deploy --only functions,firestore --project poker-memo-ai --non-interactive
+        run: |
+          if [ -d "functions" ]; then
+            npx firebase-tools@14 deploy --only functions,firestore --project poker-memo-ai --non-interactive
+          else
+            echo "functions/ 미구성 — Firestore 규칙만 배포"
+            npx firebase-tools@14 deploy --only firestore --project poker-memo-ai --non-interactive
+          fi
