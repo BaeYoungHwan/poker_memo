@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../domain/hand_memo_stats.dart';
@@ -16,14 +15,12 @@ class HandMemoStatsNotifier extends Notifier<HandMemoStats> {
   }
 
   /// 핸드 메모가 새로 기록되었을 때 호출 — 총 개수를 1 증가시킨다
+  ///
+  /// copyWith는 순수 데이터 복사라 예외가 날 수 없으므로 try-catch를 두지 않는다.
+  /// (CLAUDE.md의 try-catch 규칙은 API 호출·데이터 파싱 등 실패 가능한 외부 연동 대상이며,
+  ///  Firestore 연동이 들어가는 시점에 그 호출부에서 처리한다)
   void recordNewMemo() {
-    try {
-      state = state.copyWith(totalCount: state.totalCount + 1);
-    } catch (e) {
-      // 상태 갱신 중 예외가 나도 앱이 죽지 않도록 방어
-      // (CLAUDE.md 행동 지침: 주요 기능에 try-catch 필수)
-      debugPrint('핸드 메모 통계 갱신 실패: $e');
-    }
+    state = state.copyWith(totalCount: state.totalCount + 1);
   }
 }
 

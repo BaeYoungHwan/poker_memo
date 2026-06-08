@@ -12,6 +12,13 @@ interface AnalyzeLeakRequest {
 }
 
 /**
+ * 핸드 메모 최대 허용 길이(자) — Vertex AI 토큰 비용이 입력 길이에 비례해 늘어나므로
+ * GCP/Firebase 비용을 $300 평가판 한도 내로 제한하기 위한 안전장치로 둔다.
+ * (한 핸드를 설명하는 메모는 보통 수백 자 내외이므로 2,000자면 충분히 여유 있는 상한선)
+ */
+const MAX_HAND_MEMO_LENGTH = 2000;
+
+/**
  * 핸드 메모를 받아 Gemini Flash로 리크(약점)를 분석하는 최소 골격 (Pro 티어 핵심 기능의 출발점).
  *
  * 흐름: 인증 확인 → 입력 검증 → `logAgentExecution`으로 감싼 Vertex AI 호출 →
@@ -28,6 +35,12 @@ export const analyzeLeak = onCall<AnalyzeLeakRequest>(async (request) => {
   const handMemoText = request.data?.handMemoText?.trim();
   if (!handMemoText) {
     throw new HttpsError("invalid-argument", "분석할 핸드 메모 내용이 비어 있습니다.");
+  }
+  if (handMemoText.length > MAX_HAND_MEMO_LENGTH) {
+    throw new HttpsError(
+      "invalid-argument",
+      `핸드 메모는 최대 ${MAX_HAND_MEMO_LENGTH}자까지 분석할 수 있습니다. (입력 길이: ${handMemoText.length}자)`,
+    );
   }
 
   const userId = request.auth.uid;

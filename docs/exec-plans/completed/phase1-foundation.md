@@ -75,10 +75,11 @@ Provider/Riverpod 상태관리 구조, Vertex AI 연동 초안 + 로깅 스키�
       status: failed로 정확히 기록되어 로깅 유틸리티가 성공/실패 모두에서 정상 동작함을 함께 확인
 
 ### 6. CI/CD 파이프라인 초안
-- [ ] GitHub Actions(또는 Firebase) 기반 빌드 검증 워크플로 초안 구성
+- [x] GitHub Actions(또는 Firebase) 기반 빌드 검증 워크플로 초안 구성
+      → `.github/workflows/ci.yml`: flutter-check(analyze+test) + functions-build(tsc) + deploy-firebase(master only, GCP_SA_KEY 시크릿 필요) 3-job 구조 작성
 
 ## 완료 기준
 - [x] Flutter 앱이 Firebase(Auth/Firestore)에 연결된 상태로 실행됨
 - [x] 다크모드 테마 + Riverpod 상태관리 구조가 화면 1개 이상에 적용됨
 - [x] Cloud Functions → Vertex AI 호출 → `agent_execution_logs` 자동 기록까지 1회 이상 동작 확인
-- [ ] CI 파이프라인이 푸시 시 빌드를 검증함
+- [x] CI 파이프라인이 푸시 시 빌드를 검증함
