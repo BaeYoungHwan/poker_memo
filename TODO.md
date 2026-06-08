@@ -35,7 +35,8 @@
       → 스키마 설계, Cloud Functions 호출 골격(`analyzeLeak`), 공통 로깅 유틸리티(`agentExecutionLogger`)
       작성·배포·1회 호출 테스트까지 완료 (HTTP 200, `agent_execution_logs`에 자동 기록 확인,
       예상 비용 $0.00003 — $300 한도 영향 없음). 상세 내용 `phase1-foundation.md` 참조
-- [ ] CI/CD 파이프라인 초안 구성 (GCP / Firebase Hosting)
+- [x] CI/CD 파이프라인 초안 구성 (GCP / Firebase Hosting)
+      → `.github/workflows/ci.yml`: flutter-check + functions-build + deploy-firebase(master only) 3-job 구조
 - [ ] **GTO/ICM Go/No-Go 트리거 — 2026-06-25 점검**: 일단 내부 로직/라이브러리 개발을 진행해보고,
       이 시점에 핵심 ICM 변환 공식이 동작하는 프로토타입이 있는지 확인 →
       안 되면 그 자리에서 즉시 외부 포커 API 연동으로 전환 (PRD 9절·12절 방침에 따른 결정 시점)
