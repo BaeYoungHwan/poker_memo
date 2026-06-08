@@ -28,6 +28,14 @@ logs/
 !docs/exec-plans/active/.gitkeep
 !docs/exec-plans/completed/.gitkeep
 
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.metadata
+*.iml
+**/ios/Flutter/.last_build_id
+
 # IDE
 .vscode/
 .idea/
@@ -39,6 +47,7 @@ Thumbs.db
 # Claude Code
 .claude/sessions/
 .claude/skills/
+.claude/scheduled_tasks.lock
 
 # 세션 상태 (로컬 전용)
 docs/ref/session-state.md

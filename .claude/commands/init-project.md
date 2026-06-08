@@ -206,9 +206,11 @@ PR 생성 직전 AI가 diff를 자동으로 리뷰할까요?
 
 ### [스킬1-A] git 브랜치 전략
 
-**SCALE = 1 (개인):** main 브랜치만 사용. 인터뷰 생략.
+**SCALE = 1 (개인):** main 브랜치만 사용 (기본값). 인터뷰 생략.
 - 에이전트: `code-reviewer`, `step-validator` 자동 생성 (모든 SCALE 공통 — `agents/LANES.md` 참조)
 - `.gitignore` 하네스 파일 항목 자동 추가 (3-11에서 처리)
+- 사용자가 "PR 기반으로 관리하고 싶다"고 명시하면 `docs/ref/branch-strategy.md`(develop + PR 기반,
+  feature/* 없이 단일 보조 브랜치)를 적용한다 — 자동 적용 금지, 항상 사용자 명시 지시 필요
 
 **SCALE = 2 (스타트업):** feature/* 브랜치 전략.
 - `main` 직접 커밋 차단 (이미 deny에 추가됨)

@@ -1,0 +1,5 @@
+# Cloud Functions 빌드 산출물 및 의존성 — 커밋 대상 아님
+node_modules/
+lib/
+*.log
+.runtimeconfig.json

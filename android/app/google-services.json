@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "997874796160",
+    "project_id": "poker-memo-ai",
+    "storage_bucket": "poker-memo-ai.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:997874796160:android:cc7e1d65833e1ec5a48865",
+        "android_client_info": {
+          "package_name": "com.pokermemoai.pokermemo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBE7Wp_PX-SyyK7WGCVRy7mLSH9mL-ReIY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

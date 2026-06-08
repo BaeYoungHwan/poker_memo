@@ -28,10 +28,13 @@
 
 ## P0 — 기반 구축
 
-- [ ] Flutter 프로젝트 초기화 + Firebase 프로젝트 연결 (Auth, Firestore, Cloud Functions)
-- [ ] 다크 모드 기반 디자인 시스템 (Jet Black + Neon Green/Gold, Material 3) 구축
-- [ ] Provider/Riverpod 상태 관리 구조 셋업 (상태 관리 ↔ UI 화면 분리)
-- [ ] Vertex AI / Gemini API 연동 초안 + `agent_execution_logs` Firestore 컬렉션 스키마 설계
+- [x] Flutter 프로젝트 초기화 + Firebase 프로젝트 연결 (Auth, Firestore, Cloud Functions)
+- [x] 다크 모드 기반 디자인 시스템 (Jet Black + Neon Green/Gold, Material 3) 구축
+- [x] Provider/Riverpod 상태 관리 구조 셋업 (상태 관리 ↔ UI 화면 분리)
+- [x] Vertex AI / Gemini API 연동 초안 + `agent_execution_logs` Firestore 컬렉션 스키마 설계
+      → 스키마 설계, Cloud Functions 호출 골격(`analyzeLeak`), 공통 로깅 유틸리티(`agentExecutionLogger`)
+      작성·배포·1회 호출 테스트까지 완료 (HTTP 200, `agent_execution_logs`에 자동 기록 확인,
+      예상 비용 $0.00003 — $300 한도 영향 없음). 상세 내용 `phase1-foundation.md` 참조
 - [ ] CI/CD 파이프라인 초안 구성 (GCP / Firebase Hosting)
 - [ ] **GTO/ICM Go/No-Go 트리거 — 2026-06-25 점검**: 일단 내부 로직/라이브러리 개발을 진행해보고,
       이 시점에 핵심 ICM 변환 공식이 동작하는 프로토타입이 있는지 확인 →

@@ -1,0 +1,38 @@
+rules_version = '2';
+
+// PokerMemo AI Firestore 보안 규칙 (초안)
+// 원칙: 사용자별 데이터 격리 — 본인 데이터만 읽기/쓰기 가능, 운영 로그는 클라이언트 쓰기 전면 차단
+// 참조: docs/design-docs/architecture-v1.md §7, docs/design-docs/firestore-schema-agent-execution-logs.md §7
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 기본값: 명시적으로 허용하지 않은 모든 경로는 차단 (화이트리스트 방식)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // 유저 프로필 — 본인 문서만 읽기/쓰기 가능
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      // 유저 하위의 모든 서브컬렉션(핸드 메모, 토너먼트 기록 등)도 동일하게 본인만 접근
+      // 예: users/{userId}/hand_memos/{memoId}, users/{userId}/tournaments/{tournamentId}
+      match /{subcollection}/{docId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+
+    // AI 에이전트 실행 로그 — Cloud Functions(Admin SDK)만 기록, 클라이언트는 본인 관련 로그만 읽기
+    // (firestore-schema-agent-execution-logs.md §7 그대로 반영)
+    match /agent_execution_logs/{logId} {
+      allow read: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow write: if false;
+    }
+
+    // 주간 리포트 — 본인에게 발행된 리포트만 읽기 가능, 발행은 Cloud Functions만
+    match /weekly_reports/{reportId} {
+      allow read: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow write: if false;
+    }
+  }
+}

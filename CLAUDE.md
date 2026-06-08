@@ -62,6 +62,7 @@
 |------|-----------|
 | 새 프로젝트 시작 | [`docs/ref/project-setup.md`](docs/ref/project-setup.md) → `/init-project` |
 | TODO 작업 진행 | [`docs/ref/todo-workflow.md`](docs/ref/todo-workflow.md) |
+| git 브랜치 운영 | [`docs/ref/branch-strategy.md`](docs/ref/branch-strategy.md) (develop + PR 기반, 1인 개발 권장) |
 | 커밋 작성 | [`docs/ref/commit-convention.md`](docs/ref/commit-convention.md) |
 | 테스트 전략 | [`docs/ref/testing-patterns.md`](docs/ref/testing-patterns.md) |
 | 검증 전략 | [`docs/ref/verification-protocol.md`](docs/ref/verification-protocol.md) |
