@@ -1,7 +1,7 @@
 # PokerMemo AI 사업성 보완 제안서 v1
 
 > 버전: v1 | 작성일: 2026-06-08 | 상태: Draft
-> 배경 문서: `PRD-v1.md`, `ARD-v1.md`, `architecture-v1.md`, `xprize rule.txt`
+> 배경 문서: `PRD-v1.md`, `ARD-v1.md`, `architecture-v1.md`, `xprize-hackathon-rules.txt`
 > 목적: 기존 사업성 진단에서 도출된 5가지 리스크(시장/수익화, 카테고리 적합성,
 > AI-Native Operations 정합성, 일정, 가격정책 미결)에 대한 구체적 대응안 제시
 
