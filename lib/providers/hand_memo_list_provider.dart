@@ -19,10 +19,16 @@ final handMemoListProvider =
 class HandMemoListNotifier extends StreamNotifier<List<HandMemo>> {
   @override
   Stream<List<HandMemo>> build() {
-    final uid = FirebaseAuth.instance.currentUser?.uid;
-    // 인증 전 상태면 빈 목록 반환 (main.dart에서 익명 인증 완료 후 runApp하므로 실질적으로 발생 안 함)
-    if (uid == null) return Stream.value([]);
-    return ref.read(_handMemoServiceProvider).watchMemos(uid);
+    try {
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      // 인증 전이거나 Firebase 미초기화 상태면 빈 목록 반환
+      if (uid == null) return Stream.value([]);
+      return ref.read(_handMemoServiceProvider).watchMemos(uid);
+    } catch (e) {
+      // Firebase 미초기화(웹 설정 누락 등) 시 앱이 죽지 않도록 빈 목록으로 폴백
+      debugPrint('Firebase 미초기화 상태에서 메모 로드 시도: $e');
+      return Stream.value([]);
+    }
   }
 
   /// 새 핸드 메모 추가 — Firestore 스트림이 자동 갱신하므로 별도 state 조작 불필요
