@@ -446,7 +446,7 @@ class _ResultSectionCard extends StatelessWidget {
                         color: AppColors.textSecondary,
                         fontSize: 13)),
                 Text(
-                  "\${result.totalPrizePool.toStringAsFixed(2)}",
+                  "\$${result.totalPrizePool.toStringAsFixed(2)}",
                   style: const TextStyle(
                       color: AppColors.gold,
                       fontWeight: FontWeight.bold,
@@ -599,7 +599,7 @@ class _ResultTableRow extends StatelessWidget {
           Expanded(
             flex: 2,
             child: Text(
-              "\${equity.toStringAsFixed(2)}",
+              "\$${equity.toStringAsFixed(2)}",
               textAlign: TextAlign.center,
               style: const TextStyle(
                 color: AppColors.neonGreen,
