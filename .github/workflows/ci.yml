@@ -60,7 +60,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [flutter-check, functions-build]
     # functions-build 가 스킵된 경우에도 flutter-check 통과 시 배포 진행
-    if: |
+    if: >-
       always() &&
       needs.flutter-check.result == 'success' &&
       (needs.functions-build.result == 'success' || needs.functions-build.result == 'skipped') &&
