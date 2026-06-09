@@ -1,4 +1,4 @@
-﻿/// GTO 레인지 테이블 & 서비스 단위 테스트
+/// GTO 레인지 테이블 & 서비스 단위 테스트
 ///
 /// 검증 항목:
 /// 1. BTN 레인지 비율이 40~50% 사이인지
@@ -7,6 +7,7 @@
 /// 4. AA가 BTN/CO/HJ/UTG/SB 모두에서 오픈 레인지에 포함되는지
 /// 5. BB의 오픈 레인지가 비어있는지
 /// 6. allHands()가 정확히 169개 핸드를 반환하는지
+library;
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:poker_memo_ai/domain/hand_memo.dart';
@@ -19,18 +20,18 @@ void main() {
     test('BTN 레인지 비율이 40% 이상 50% 이하', () {
       final double pct = GtoRangeService.rangePercentage(PokerPosition.btn);
       expect(pct, greaterThanOrEqualTo(40.0),
-          reason: 'BTN 레인지는 최소 40%여야 합니다. 실제: ${pct}%');
+          reason: 'BTN 레인지는 최소 40%여야 합니다. 실제: $pct%');
       expect(pct, lessThanOrEqualTo(50.0),
-          reason: 'BTN 레인지는 최대 50%여야 합니다. 실제: ${pct}%');
+          reason: 'BTN 레인지는 최대 50%여야 합니다. 실제: $pct%');
     });
 
     // UTG 레인지 비율이 10~18% 사이여야 함 (6-max 기준 약 13%)
     test('UTG 레인지 비율이 10% 이상 18% 이하', () {
       final double pct = GtoRangeService.rangePercentage(PokerPosition.utg);
       expect(pct, greaterThanOrEqualTo(10.0),
-          reason: 'UTG 레인지는 최소 10%여야 합니다. 실제: ${pct}%');
+          reason: 'UTG 레인지는 최소 10%여야 합니다. 실제: $pct%');
       expect(pct, lessThanOrEqualTo(18.0),
-          reason: 'UTG 레인지는 최대 18%여야 합니다. 실제: ${pct}%');
+          reason: 'UTG 레인지는 최대 18%여야 합니다. 실제: $pct%');
     });
   });
 
@@ -40,7 +41,7 @@ void main() {
       final int utg = GtoRangeService.getOpenRange(PokerPosition.utg).length;
       final int btn = GtoRangeService.getOpenRange(PokerPosition.btn).length;
       expect(utg, lessThan(btn),
-          reason: 'UTG(${utg}핸드)는 BTN(${btn}핸드)보다 좁아야 합니다');
+          reason: 'UTG(${utg}핸드)는 BTN(${btn}핸드)보다 좁아야 합니다'); // ignore: unnecessary_brace_in_string_interps
     });
 
     // AA는 모든 오픈 포지션에서 레인지에 포함되어야 함
@@ -104,7 +105,7 @@ void main() {
         final int count = kGtoOpenRaiseRange[pos]?.length ?? 0;
         final double pct = (count / 169) * 100;
         // ignore: avoid_print
-        print('${pos.name.toUpperCase()}: ${count}핸드 (${pct.toStringAsFixed(1)}%)');
+        print('${pos.name.toUpperCase()}: ${count}핸드 (${pct.toStringAsFixed(1)}%)'); // ignore: unnecessary_brace_in_string_interps
       }
       expect(kGtoOpenRaiseRange, isNotEmpty);
     });
