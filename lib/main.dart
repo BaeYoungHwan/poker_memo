@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,8 +15,12 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    // 재실행 시 기존 익명 세션을 재사용해 같은 uid(= 같은 Firestore 데이터)를 유지
+    if (FirebaseAuth.instance.currentUser == null) {
+      await FirebaseAuth.instance.signInAnonymously();
+    }
   } catch (e) {
-    // Firebase 초기화 실패 시에도 앱이 죽지 않도록 로그만 남기고 계속 진행
+    // 초기화 실패 시에도 앱이 죽지 않도록 로그만 남기고 계속 진행
     // (CLAUDE.md 행동 지침: 모든 주요 외부 연동 호출에 try-catch 필수)
     debugPrint('Firebase 초기화 실패: $e');
   }

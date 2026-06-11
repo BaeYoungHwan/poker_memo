@@ -75,3 +75,6 @@ export const analyzeLeak = onCall<AnalyzeLeakRequest>(async (request) => {
     throw new HttpsError("internal", "리크 분석 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
   }
 });
+
+// gtoAdvice Cloud Function — GTO 레인지 기반 핸드 코칭 (hand_coaching 태스크)
+export { gtoAdvice } from "./gtoAdvice";
