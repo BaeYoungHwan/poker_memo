@@ -36,6 +36,9 @@ logs/
 *.iml
 **/ios/Flutter/.last_build_id
 
+# Flutter 웹 플랫폼 (flutter run -d chrome 시 자동 생성, 로컬 검증용)
+web/
+
 # IDE
 .vscode/
 .idea/

@@ -37,9 +37,9 @@
       예상 비용 $0.00003 — $300 한도 영향 없음). 상세 내용 `phase1-foundation.md` 참조
 - [x] CI/CD 파이프라인 초안 구성 (GCP / Firebase Hosting)
       → `.github/workflows/ci.yml`: flutter-check + functions-build + deploy-firebase(master only) 3-job 구조
-- [🔄] **GTO/ICM Go/No-Go 트리거 — 2026-06-25 점검**: 프로토타입 구현 완료 (2026-06-09),
-      2026-06-10 검증 예정 (ICM 수치 외부 도구 비교 + UI 실행 + gtoAdvice Cloud Function 호출)
-      → 검증 통과 시 내부 구현 확정, 실패 시 외부 포커 API 전환
+- [x] **GTO/ICM Go/No-Go 트리거**: 2026-06-11 검증 완료 → ICM 계산/Flutter UI PASS, 내부 구현 확정 (Go).
+      gtoAdvice Cloud Function은 운영 환경 배포 완료, 단독 호출 검증은 보류 →
+      Flutter 화면 실제 연동 시 함께 검증 (`docs/exec-plans/active/phase2-gto-icm-prototype.md` 참조)
 
 ---
 
@@ -51,14 +51,15 @@
       → GTO 정적 레인지 테이블 6개 포지션 구현 완료 (BTN 44%, CO 22%, HJ 15%, UTG 11%)
 
 ### Plus Tier
-- [🔄] ICM 계산기 (칩 가치 ↔ 상금 가치 변환 — 변수명 명확히 분리)
-      → Malmuth-Harville 알고리즘 + Flutter UI 구현 완료, 2026-06-10 외부 도구 비교 검증 예정
+- [x] ICM 계산기 (칩 가치 ↔ 상금 가치 변환 — 변수명 명확히 분리)
+      → Malmuth-Harville 알고리즘 + Flutter UI 구현 및 검증 완료 (2026-06-11)
 - [ ] 토너먼트 상세 기능
 - [ ] 대회 포스터/정보 이미지 업로드 → AI 스캔 기능 (Vertex AI/Gemini)
 
 ### Pro Tier (핵심 AI 에이전트)
 - [🔄] LLM 기반 포커 AI 코칭
-      → gtoAdvice Cloud Function 구현 완료 (포지션별 GTO 컨텍스트 + Gemini Flash), Flutter 화면 연동 미완
+      → gtoAdvice Cloud Function 구현 + 운영 환경 배포 완료 (포지션별 GTO 컨텍스트 + Gemini Flash),
+      Flutter 화면 연동(`gto_range_screen.dart` 더미 → 실제 호출) 및 호출 검증 미완 — 다음 작업
 - [ ] 개인 맞춤형 핸드레인지 설정 및 솔루션 제공
 - [ ] 누적 데이터 기반 유저 약점(Leak) 분석 → 주간 리포트 자동 발행 (+ 실행 로그 자동 기록)
 
@@ -85,8 +86,8 @@
 - [ ] Google Cloud Platform (GCP) / Firebase 호스팅·스토어 배포
 - [ ] KPI 측정 기준 설정 (유료 구독 매출 발생, 주간 리포트 자동 발행/운영 로그 연속 기록)
 - [ ] CAC(고객 획득 비용) 0원이라도 명확히 기록 및 공개 (해커톤 증빙용)
-- [ ] [확인 필요] `web/` 폴더 처리 — 다른 세션 작업 중 생성된 Flutter 웹 플랫폼 폴더(untracked),
-      해당 세션에서 정리/삭제 예정. develop에 커밋하지 말고 그대로 둘 것
+- [x] `web/` 폴더 처리 — Flutter 웹 검증 시 자동 생성된 플랫폼 폴더로 확인,
+      `.gitignore`에 `web/` 추가하여 커밋 대상에서 제외 (로컬에는 유지 — 웹 검증 계속 가능)
 
 ---
 

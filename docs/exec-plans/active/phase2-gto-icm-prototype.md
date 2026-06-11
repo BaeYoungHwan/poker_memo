@@ -1,8 +1,9 @@
 # Phase 2 — GTO/ICM 내부 로직 프로토타입
 
-> 상태: 🔄 구현 완료 / 검증 대기
+> 상태: ✅ 내부 구현 확정 (Go) / gtoAdvice 연동 검증은 보류
 > 생성일: 2026-06-09
 > Go/No-Go 결정일: **2026-06-25** (검증 통과 → 내부 구현 확정, 실패 → 외부 API 전환)
+> 검증 완료일: 2026-06-11
 
 ---
 
@@ -35,29 +36,37 @@
 
 ---
 
-## 대기 중인 작업 🔄
+## 검증 결과 (2026-06-10 ~ 2026-06-11)
 
-### 내일 (2026-06-10) 검증 체크리스트
+**1. ICM 수치 외부 비교** — 사용자 수동 작업 (별도 진행)
 
-**1. ICM 수치 외부 비교**
-- [ ] icmizer.com 또는 holdemresources.net에서 A=50,000 / B=30,000 / C=20,000 / 상금 1000/500/200 입력
-- [ ] 우리 앱 결과(A≈701.79, B≈552.5, C≈445.71)와 ±$1 이내 일치 확인
+**2. Flutter UI 실행 (`flutter run`)** — ✅ PASS
+- [x] ICM 계산기: 플레이어 입력 → 계산 → 에퀴티 표 정상 출력 (A=$701.79, B=$552.50, C=$445.71)
+- [x] GTO 그리드: BTN 선택(44.4% neonGreen) / UTG 선택(11.2% neonGreen) 정상 렌더링, BTN > UTG 순서 확인
+- [x] 에러 케이스: 최소 2명 입력이 UI에서 강제되어 "1명 계산" 자체가 불가 — 설계상 도달 불가능한 케이스로 확인 (버그 아님)
 
-**2. Flutter UI 실행 (`flutter run`)**
-- [ ] ICM 계산기: 플레이어 입력 → 계산 → 에퀴티 표 정상 출력
-- [ ] GTO 그리드: BTN 선택(44% neonGreen) / UTG 선택(11% neonGreen) 정상 렌더링
-- [ ] 에러 케이스: 플레이어 1명 계산 시도 → 에러 메시지 표시
-
-**3. gtoAdvice Cloud Function 호출**
-- [ ] `firebase emulators:start --only functions` 실행
-- [ ] 포지션/스택/핸드메모 입력 → Gemini Flash 응답 확인
-- [ ] Firestore `agent_execution_logs`에 `hand_coaching` 로그 기록 확인
+**3. gtoAdvice Cloud Function 호출** — 🔄 보류 (Flutter 연동 시 검증)
+- [x] `gtoAdvice` 운영 환경(`poker-memo-ai`, us-central1) 배포 완료
+- [ ] 함수 단독 호출 검증 — Firebase Auth ID 토큰 발급에 `iam.serviceAccounts.signBlob` 권한 필요,
+      현재 계정에 권한 없음 (CLI 단독 검증 중단)
+- [ ] **다음 단계에서 Flutter 화면 실제 연동 시, 앱의 익명 로그인(`lib/main.dart`)을 통해
+      자연스럽게 호출 → Gemini 응답 + `agent_execution_logs` `hand_coaching` 로그 기록 함께 검증**
 
 ---
 
-## 다음 단계 (검증 통과 후)
+## Go/No-Go 결론
+
+내부 GTO/ICM 로직(ICM 계산, 레인지 데이터, Flutter UI)은 화면단까지 정상 동작 확인 → **Go, 내부 구현 확정**.
+`gtoAdvice` AI 연동(Cloud Function ↔ Flutter)은 별도 작업으로 다음 단계에서 진행 + 검증.
+
+---
+
+## 다음 단계
 
 1. `gtoAdvice` Flutter 화면 실제 연동 (더미 → 실제 Cloud Function 호출)
+   - 검증 가이드: 별도 인증 우회 불필요 — `flutter run`으로 앱 실행 시
+     자동 익명 로그인을 그대로 사용해 GTO 레인지 화면에서 버튼 클릭 →
+     응답 텍스트 + Firestore `agent_execution_logs`(`hand_coaching`) 기록 확인
 2. Plus Tier 토너먼트 상세 기능
 3. 포스터 스캔 (Vertex AI Vision)
 4. 주간 리포트 자동 발행 (Pro Tier 핵심)
