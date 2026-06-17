@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/theme/app_colors.dart';
 import '../domain/hand_memo.dart';
 import '../providers/hand_memo_list_provider.dart';
+import '../providers/tournament_list_provider.dart';
 
 /// 핸드 메모 작성 화면
 /// CLAUDE.md UI 규칙: 하단 버튼 고정(SafeArea), 52dp 높이, 한 손 조작 우선
@@ -16,6 +17,8 @@ class AddHandMemoScreen extends ConsumerStatefulWidget {
 
 class _AddHandMemoScreenState extends ConsumerState<AddHandMemoScreen> {
   PokerPosition? _selectedPosition;
+  // null이면 "선택 안 함" — 특정 토너먼트와 연결하지 않은 메모
+  String? _selectedTournamentId;
   final _noteController = TextEditingController();
   bool _isSaving = false;
 
@@ -33,6 +36,7 @@ class _AddHandMemoScreenState extends ConsumerState<AddHandMemoScreen> {
       await ref.read(handMemoListProvider.notifier).addMemo(
             _selectedPosition!,
             _noteController.text,
+            tournamentId: _selectedTournamentId,
           );
       if (mounted) Navigator.pop(context);
     } catch (e) {
@@ -52,6 +56,7 @@ class _AddHandMemoScreenState extends ConsumerState<AddHandMemoScreen> {
   @override
   Widget build(BuildContext context) {
     final canSave = _selectedPosition != null && !_isSaving;
+    final tournamentsAsync = ref.watch(tournamentListProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('핸드 메모 작성')),
@@ -103,6 +108,50 @@ class _AddHandMemoScreenState extends ConsumerState<AddHandMemoScreen> {
                   ),
                 );
               }).toList(),
+            ),
+          ),
+          // 토너먼트 선택 레이블 (선택 사항)
+          const Padding(
+            padding: EdgeInsets.fromLTRB(20, 24, 20, 12),
+            child: Text(
+              '토너먼트 (선택)',
+              style: TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.5,
+              ),
+            ),
+          ),
+          // 토너먼트 ChoiceChip — "선택 안 함" + 등록된 토너먼트 목록, 가로 스크롤
+          SizedBox(
+            height: 40,
+            child: tournamentsAsync.when(
+              data: (tournaments) => SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  children: [
+                    _TournamentChip(
+                      label: '선택 안 함',
+                      isSelected: _selectedTournamentId == null,
+                      onSelected: () =>
+                          setState(() => _selectedTournamentId = null),
+                    ),
+                    ...tournaments.map((t) => Padding(
+                          padding: const EdgeInsets.only(left: 8),
+                          child: _TournamentChip(
+                            label: t.name,
+                            isSelected: _selectedTournamentId == t.id,
+                            onSelected: () =>
+                                setState(() => _selectedTournamentId = t.id),
+                          ),
+                        )),
+                  ],
+                ),
+              ),
+              loading: () => const SizedBox.shrink(),
+              error: (e, _) => const SizedBox.shrink(),
             ),
           ),
           // 메모 입력 레이블
@@ -169,6 +218,38 @@ class _AddHandMemoScreenState extends ConsumerState<AddHandMemoScreen> {
               : const Text('저장'),
         ),
       ),
+    );
+  }
+}
+
+/// 토너먼트 선택용 단일 칩 — 포지션 ChoiceChip과 동일한 스타일 컨벤션
+class _TournamentChip extends StatelessWidget {
+  const _TournamentChip({
+    required this.label,
+    required this.isSelected,
+    required this.onSelected,
+  });
+  final String label;
+  final bool isSelected;
+  final VoidCallback onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return ChoiceChip(
+      label: Text(label),
+      selected: isSelected,
+      onSelected: (_) => onSelected(),
+      selectedColor: AppColors.neonGreen,
+      backgroundColor: AppColors.surfaceVariant,
+      labelStyle: TextStyle(
+        color: isSelected ? Colors.black : AppColors.textPrimary,
+        fontWeight: FontWeight.bold,
+        fontSize: 13,
+      ),
+      side: BorderSide(
+        color: isSelected ? AppColors.neonGreen : Colors.transparent,
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
     );
   }
 }

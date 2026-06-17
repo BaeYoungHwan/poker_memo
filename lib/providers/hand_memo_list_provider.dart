@@ -32,7 +32,12 @@ class HandMemoListNotifier extends StreamNotifier<List<HandMemo>> {
   }
 
   /// 새 핸드 메모 추가 — Firestore 스트림이 자동 갱신하므로 별도 state 조작 불필요
-  Future<void> addMemo(PokerPosition position, String noteText) async {
+  /// [tournamentId]가 주어지면 해당 토너먼트와 연결되고, null이면 미연결 메모로 저장된다
+  Future<void> addMemo(
+    PokerPosition position,
+    String noteText, {
+    String? tournamentId,
+  }) async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
 
@@ -42,6 +47,7 @@ class HandMemoListNotifier extends StreamNotifier<List<HandMemo>> {
       position: position,
       noteText: noteText.trim(),
       createdAt: DateTime.now(),
+      tournamentId: tournamentId,
     );
 
     try {
