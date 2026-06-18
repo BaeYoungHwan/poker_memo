@@ -78,3 +78,6 @@ export const analyzeLeak = onCall<AnalyzeLeakRequest>(async (request) => {
 
 // gtoAdvice Cloud Function — GTO 레인지 기반 핸드 코칭 (hand_coaching 태스크)
 export { gtoAdvice } from "./gtoAdvice";
+
+// scanPoster Cloud Function — 토너먼트 포스터 이미지 스캔 (poster_scan 태스크)
+export { scanPoster } from "./scanPoster";

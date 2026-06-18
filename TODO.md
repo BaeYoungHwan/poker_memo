@@ -58,7 +58,11 @@
       핸드 메모는 `tournamentId`(nullable)로 토너먼트와 선택적 연결. HomeScreen AppBar에
       토너먼트/ICM/GTO 진입점 3개 함께 연결 (기존 ICM/GTO 라우팅 누락 해소).
       `flutter analyze`/`flutter test` 30/30 pass, 실기기 검증은 보류 (`phase3-tournament-detail.md` 참조)
-- [ ] 대회 포스터/정보 이미지 업로드 → AI 스캔 기능 (Vertex AI/Gemini)
+- [x] 대회 포스터/정보 이미지 업로드 → AI 스캔 기능 (Vertex AI/Gemini)
+      → scanPoster Cloud Function(Gemini Flash Vision, Base64 직접 전달 - Storage 미사용) +
+      Flutter AddTournamentScreen "포스터로 채우기" 통합 구현 완료 (2026-06-18).
+      `flutter analyze`/`flutter test` 48/48 pass, `tsc --noEmit` 0 errors,
+      실기기 검증은 보류 (`phase4-poster-scan.md` 참조)
 
 ### Pro Tier (핵심 AI 에이전트)
 - [🔄] LLM 기반 포커 AI 코칭

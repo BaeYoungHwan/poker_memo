@@ -1,4 +1,4 @@
-import { VertexAI } from "@google-cloud/vertexai";
+import { VertexAI, Part } from "@google-cloud/vertexai";
 
 /**
  * 비용 효율을 위해 기본적으로 Gemini Flash 계열을 사용한다 (CLAUDE.md 기술 스택 규칙).
@@ -28,6 +28,35 @@ function getVertexAi(): VertexAI {
 }
 
 /**
+ * Gemini Flash 모델에 멀티모달 `parts`(텍스트/이미지 등)를 보내고
+ * 응답 텍스트·토큰 사용량을 추출하는 공통 내부 헬퍼.
+ *
+ * `callGeminiFlash`(텍스트 전용)와 `callGeminiFlashVision`(텍스트+이미지)이
+ * 이 함수를 공유해 응답 파싱 로직 중복을 없앤다.
+ */
+async function generateContentInternal(parts: Part[]): Promise<GeminiCallResult> {
+  const model = getVertexAi().getGenerativeModel({ model: FLASH_MODEL_NAME });
+
+  const response = await model.generateContent({
+    contents: [{ role: "user", parts }],
+  });
+
+  const candidate = response.response.candidates?.[0];
+  const text = candidate?.content?.parts?.map((part) => part.text ?? "").join("") ?? "";
+
+  // 토큰 사용량은 응답의 usageMetadata에서 추출한다 (비용 계산의 기준값)
+  const usage = response.response.usageMetadata;
+  const inputTokenCount = usage?.promptTokenCount ?? 0;
+  const outputTokenCount = usage?.candidatesTokenCount ?? 0;
+
+  if (!text) {
+    throw new Error("Gemini 응답에서 텍스트를 추출하지 못했습니다.");
+  }
+
+  return { text, inputTokenCount, outputTokenCount };
+}
+
+/**
  * Gemini Flash 모델에 단일 프롬프트를 보내고 응답 텍스트·토큰 사용량을 반환하는 최소 골격.
  *
  * 실제 리크 분석·주간 리포트·포스터 스캔 등은 이 함수를 기반으로 프롬프트만 바꿔 확장한다.
@@ -36,25 +65,31 @@ function getVertexAi(): VertexAI {
  */
 export async function callGeminiFlash(prompt: string): Promise<GeminiCallResult> {
   try {
-    const model = getVertexAi().getGenerativeModel({ model: FLASH_MODEL_NAME });
+    return await generateContentInternal([{ text: prompt }]);
+  } catch (error) {
+    // 호출부에서 상태(failed)와 에러 메시지를 일괄 기록하므로 여기서는 그대로 재전파한다
+    throw error instanceof Error ? error : new Error(String(error));
+  }
+}
 
-    const response = await model.generateContent({
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-    });
-
-    const candidate = response.response.candidates?.[0];
-    const text = candidate?.content?.parts?.map((part) => part.text ?? "").join("") ?? "";
-
-    // 토큰 사용량은 응답의 usageMetadata에서 추출한다 (비용 계산의 기준값)
-    const usage = response.response.usageMetadata;
-    const inputTokenCount = usage?.promptTokenCount ?? 0;
-    const outputTokenCount = usage?.candidatesTokenCount ?? 0;
-
-    if (!text) {
-      throw new Error("Gemini 응답에서 텍스트를 추출하지 못했습니다.");
-    }
-
-    return { text, inputTokenCount, outputTokenCount };
+/**
+ * Gemini Flash 모델에 텍스트 프롬프트 + 이미지(base64)를 함께 보내는 멀티모달 호출 함수.
+ * 토너먼트 포스터 스캔처럼 이미지 인식이 필요한 기능에서 사용한다.
+ *
+ * @param prompt 이미지와 함께 전달할 지시문(텍스트)
+ * @param imageBase64 순수 base64 인코딩 이미지 데이터 (data URI 접두사 제외)
+ * @param mimeType 이미지 MIME 타입 (예: "image/jpeg")
+ */
+export async function callGeminiFlashVision(
+  prompt: string,
+  imageBase64: string,
+  mimeType: string,
+): Promise<GeminiCallResult> {
+  try {
+    return await generateContentInternal([
+      { text: prompt },
+      { inlineData: { mimeType, data: imageBase64 } },
+    ]);
   } catch (error) {
     // 호출부에서 상태(failed)와 에러 메시지를 일괄 기록하므로 여기서는 그대로 재전파한다
     throw error instanceof Error ? error : new Error(String(error));

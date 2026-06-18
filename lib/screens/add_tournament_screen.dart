@@ -1,14 +1,18 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../core/theme/app_colors.dart';
 import '../providers/tournament_list_provider.dart';
+import '../services/poster_scan_service.dart';
 
-/// 토너먼트 작성 화면
-/// CLAUDE.md UI 규칙: 하단 버튼 고정(SafeArea), 한 손 조작 우선
 class AddTournamentScreen extends ConsumerStatefulWidget {
-  const AddTournamentScreen({super.key});
+  const AddTournamentScreen({super.key, this.posterScanService});
+
+  final PosterScanService? posterScanService;
 
   @override
   ConsumerState<AddTournamentScreen> createState() => _AddTournamentScreenState();
@@ -19,6 +23,12 @@ class _AddTournamentScreenState extends ConsumerState<AddTournamentScreen> {
   final _buyInController = TextEditingController();
   DateTime _selectedDate = DateTime.now();
   bool _isSaving = false;
+  bool _isScanning = false;
+
+  late final PosterScanService _posterScanService =
+      widget.posterScanService ?? PosterScanService();
+
+  static const int _maxPosterImageBytes = 4 * 1024 * 1024;
 
   @override
   void dispose() {
@@ -35,6 +45,127 @@ class _AddTournamentScreenState extends ConsumerState<AddTournamentScreen> {
       lastDate: DateTime(2100),
     );
     if (picked != null) setState(() => _selectedDate = picked);
+  }
+
+  /// 카메라/갤러리 선택 바텀시트를 띄우고, 선택된 소스로 포스터 스캔을 진행한다
+  Future<void> _showPosterScanSheet() async {
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      backgroundColor: AppColors.surface,
+      builder: (sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt_outlined, color: AppColors.neonGreen),
+              title: const Text('카메라로 촬영', style: TextStyle(color: AppColors.textPrimary)),
+              onTap: () => Navigator.pop(sheetContext, ImageSource.camera),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library_outlined, color: AppColors.neonGreen),
+              title: const Text('갤러리에서 선택', style: TextStyle(color: AppColors.textPrimary)),
+              onTap: () => Navigator.pop(sheetContext, ImageSource.gallery),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (source != null) {
+      await _pickAndScanPoster(source);
+    }
+  }
+
+  /// XFile이 보고하는 mimeType이 비어있는 플랫폼(특히 데스크톱)을 대비해
+  /// 확장자 기반으로도 추정하는 보조 로직 - 서버가 허용하는 3종 형식만 통과시킨다
+  String? _resolveMimeType(XFile file) {
+    final reported = file.mimeType;
+    if (reported == 'image/jpeg' || reported == 'image/png' || reported == 'image/webp') {
+      return reported;
+    }
+    final path = file.path.toLowerCase();
+    if (path.endsWith('.jpg') || path.endsWith('.jpeg')) return 'image/jpeg';
+    if (path.endsWith('.png')) return 'image/png';
+    if (path.endsWith('.webp')) return 'image/webp';
+    return null;
+  }
+
+  /// 이미지 선택 -> 크기/형식 검증 -> Base64 인코딩 -> scanPoster 호출 -> 폼 필드 자동 채움
+  /// (CLAUDE.md: 외부 호출 try-catch 필수. AI 결과는 사용자가 검토/수정 가능하도록 폼에만 채워두고 자동 저장하지 않음)
+  Future<void> _pickAndScanPoster(ImageSource source) async {
+    if (_isScanning) return;
+
+    try {
+      final picked = await ImagePicker().pickImage(source: source, imageQuality: 85);
+      if (picked == null) return;
+
+      final bytes = await picked.readAsBytes();
+      if (bytes.length > _maxPosterImageBytes) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('이미지 용량이 너무 큽니다. 더 작은 이미지로 다시 시도해 주세요.'),
+              backgroundColor: AppColors.negative,
+            ),
+          );
+        }
+        return;
+      }
+
+      final mimeType = _resolveMimeType(picked);
+      if (mimeType == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('지원하지 않는 이미지 형식입니다.'),
+              backgroundColor: AppColors.negative,
+            ),
+          );
+        }
+        return;
+      }
+
+      setState(() => _isScanning = true);
+
+      final result = await _posterScanService.scanPoster(
+        imageBase64: base64Encode(bytes),
+        mimeType: mimeType,
+      );
+
+      if (!mounted) return;
+
+      setState(() {
+        final name = result.name;
+        if (name != null && name.isNotEmpty) {
+          _nameController.text = name;
+        }
+        final buyIn = result.buyIn;
+        if (buyIn != null) {
+          _buyInController.text =
+              buyIn == buyIn.roundToDouble() ? buyIn.toInt().toString() : buyIn.toString();
+        }
+        final date = result.date;
+        if (date != null) {
+          final parsedDate = DateTime.tryParse(date);
+          if (parsedDate != null) _selectedDate = parsedDate;
+        }
+      });
+
+      final warning = result.warning;
+      if (warning != null && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(warning), backgroundColor: AppColors.surfaceVariant),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('포스터 분석 실패: $e'), backgroundColor: AppColors.negative),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isScanning = false);
+    }
   }
 
   Future<void> _save() async {
@@ -69,7 +200,25 @@ class _AddTournamentScreenState extends ConsumerState<AddTournamentScreen> {
     final canSave = _nameController.text.trim().isNotEmpty && !_isSaving;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('토너먼트 기록')),
+      appBar: AppBar(
+        title: const Text('토너먼트 기록'),
+        actions: [
+          IconButton(
+            onPressed: _isScanning ? null : _showPosterScanSheet,
+            tooltip: '포스터로 채우기',
+            icon: _isScanning
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: AppColors.neonGreen,
+                    ),
+                  )
+                : const Icon(Icons.document_scanner_outlined),
+          ),
+        ],
+      ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
         children: [
@@ -173,7 +322,6 @@ class _AddTournamentScreenState extends ConsumerState<AddTournamentScreen> {
           ),
         ],
       ),
-      // 저장 버튼 — 하단 고정, 이름 미입력 시 비활성화
       bottomNavigationBar: SafeArea(
         minimum: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         child: ElevatedButton(
