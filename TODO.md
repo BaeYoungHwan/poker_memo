@@ -53,13 +53,19 @@
 ### Plus Tier
 - [x] ICM 계산기 (칩 가치 ↔ 상금 가치 변환 — 변수명 명확히 분리)
       → Malmuth-Harville 알고리즘 + Flutter UI 구현 및 검증 완료 (2026-06-11)
-- [ ] 토너먼트 상세 기능
+- [x] 토너먼트 상세 기능
+      → Tournament 모델/서비스/Provider + 토너먼트 목록·작성·상세 화면 구현 완료 (2026-06-17).
+      핸드 메모는 `tournamentId`(nullable)로 토너먼트와 선택적 연결. HomeScreen AppBar에
+      토너먼트/ICM/GTO 진입점 3개 함께 연결 (기존 ICM/GTO 라우팅 누락 해소).
+      `flutter analyze`/`flutter test` 30/30 pass, 실기기 검증은 보류 (`phase3-tournament-detail.md` 참조)
 - [ ] 대회 포스터/정보 이미지 업로드 → AI 스캔 기능 (Vertex AI/Gemini)
 
 ### Pro Tier (핵심 AI 에이전트)
 - [🔄] LLM 기반 포커 AI 코칭
       → gtoAdvice Cloud Function 구현 + 운영 환경 배포 완료 (포지션별 GTO 컨텍스트 + Gemini Flash),
-      Flutter 화면 연동(`gto_range_screen.dart` 더미 → 실제 호출) 및 호출 검증 미완 — 다음 작업
+      Flutter 화면 연동(`gto_range_screen.dart` 더미 → 실제 호출) 코드 완료 (2026-06-17).
+      실기기/에뮬레이터 종단 검증(응답 확인 + `agent_execution_logs` 기록 확인)은
+      사용자가 개발 더 진행한 후 직행 예정 — 보류
 - [ ] 개인 맞춤형 핸드레인지 설정 및 솔루션 제공
 - [ ] 누적 데이터 기반 유저 약점(Leak) 분석 → 주간 리포트 자동 발행 (+ 실행 로그 자동 기록)
 

@@ -45,12 +45,22 @@
 - [x] GTO 그리드: BTN 선택(44.4% neonGreen) / UTG 선택(11.2% neonGreen) 정상 렌더링, BTN > UTG 순서 확인
 - [x] 에러 케이스: 최소 2명 입력이 UI에서 강제되어 "1명 계산" 자체가 불가 — 설계상 도달 불가능한 케이스로 확인 (버그 아님)
 
-**3. gtoAdvice Cloud Function 호출** — 🔄 보류 (Flutter 연동 시 검증)
+**3. gtoAdvice Cloud Function 호출** — 🔄 코드 연동 완료 / 실기기 검증 보류
 - [x] `gtoAdvice` 운영 환경(`poker-memo-ai`, us-central1) 배포 완료
 - [ ] 함수 단독 호출 검증 — Firebase Auth ID 토큰 발급에 `iam.serviceAccounts.signBlob` 권한 필요,
       현재 계정에 권한 없음 (CLI 단독 검증 중단)
-- [ ] **다음 단계에서 Flutter 화면 실제 연동 시, 앱의 익명 로그인(`lib/main.dart`)을 통해
-      자연스럽게 호출 → Gemini 응답 + `agent_execution_logs` `hand_coaching` 로그 기록 함께 검증**
+- [x] **Flutter 화면 실제 연동 완료** (2026-06-17)
+      - `lib/services/gto_advice_service.dart` 신규 — `cloud_functions` 패키지로 `gtoAdvice` 콜러블 호출
+      - `lib/providers/gto_provider.dart` — `stackSizeInput`/`blindLevelInput` 상태 + 업데이트 메서드 추가
+      - `lib/screens/gto_range_screen.dart` — 스택/블라인드 입력 필드 추가, "AI GTO 조언 받기" 버튼을
+        더미 스낵바 → 실제 Cloud Function 호출(로딩/에러/결과 상태 반영)로 교체
+      - 검증: `flutter analyze` 0 issues, `flutter test` 28/28 pass, `tsc --noEmit` 0 errors
+- [ ] **실기기/에뮬레이터 종단 검증 보류** — 현재 세션 환경(Windows 데스크톱)에는 Android/iOS
+      에뮬레이터가 연결되어 있지 않고, Firebase 프로젝트도 Android/iOS만 구성되어 있어
+      Chrome/Edge/Windows 데스크톱으로는 Firebase 초기화 자체가 안 됨 (`firebase_options.dart`가
+      web/windows에서 `UnsupportedError` 던짐). **사용자가 Android 기기/에뮬레이터에서
+      `flutter run` 실행 → GTO 레인지 화면에서 버튼 클릭 → 응답 텍스트 + Firestore
+      `agent_execution_logs`(`hand_coaching`) 기록 확인 필요**
 
 ---
 
@@ -63,10 +73,8 @@
 
 ## 다음 단계
 
-1. `gtoAdvice` Flutter 화면 실제 연동 (더미 → 실제 Cloud Function 호출)
-   - 검증 가이드: 별도 인증 우회 불필요 — `flutter run`으로 앱 실행 시
-     자동 익명 로그인을 그대로 사용해 GTO 레인지 화면에서 버튼 클릭 →
-     응답 텍스트 + Firestore `agent_execution_logs`(`hand_coaching`) 기록 확인
+1. ~~`gtoAdvice` Flutter 화면 실제 연동~~ — 코드 연동 완료 (위 섹션 참고),
+   실기기 종단 검증은 사용자 환경에서 별도 진행 필요
 2. Plus Tier 토너먼트 상세 기능
 3. 포스터 스캔 (Vertex AI Vision)
 4. 주간 리포트 자동 발행 (Pro Tier 핵심)

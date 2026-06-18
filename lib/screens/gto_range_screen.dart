@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/theme/app_colors.dart';
 import '../domain/hand_memo.dart';
 import '../providers/gto_provider.dart';
+import '../services/gto_advice_service.dart';
 import '../services/gto_range_service.dart';
 
 /// GTO 핸드레인지 화면
@@ -204,9 +206,31 @@ class _AdviceSection extends ConsumerWidget {
             style: const TextStyle(color: AppColors.textPrimary, fontSize: 14),
             maxLines: 2,
           ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  onChanged: notifier.updateStackSizeInput,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  decoration: _smallFieldDecoration(hint: '스택(BB)'),
+                  style: const TextStyle(color: AppColors.textPrimary, fontSize: 13),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: TextField(
+                  onChanged: notifier.updateBlindLevelInput,
+                  decoration: _smallFieldDecoration(hint: '블라인드 (예: 500/1000)'),
+                  style: const TextStyle(color: AppColors.textPrimary, fontSize: 13),
+                ),
+              ),
+            ],
+          ),
           const SizedBox(height: 10),
           ElevatedButton(
-            onPressed: gtoState.isLoadingAdvice ? null : () => _onAdvicePressed(context),
+            onPressed: gtoState.isLoadingAdvice ? null : _onAdvicePressed,
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.neonGreen,
               foregroundColor: Colors.black,
@@ -244,14 +268,54 @@ class _AdviceSection extends ConsumerWidget {
     );
   }
 
-  /// 조언 버튼 탭 핸들러 - 현재는 더미(Pro 티어 스낵바), 추후 Cloud Function 연동
-  void _onAdvicePressed(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: const Text('Pro 티어 기능입니다'),
-      backgroundColor: AppColors.surfaceVariant,
-      behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      duration: const Duration(seconds: 2),
-    ));
+  /// 조언 버튼 탭 핸들러 - 입력값 검증 후 gtoAdvice Cloud Function을 호출한다
+  Future<void> _onAdvicePressed() async {
+    final handMemoText = gtoState.handMemoInput.trim();
+    if (handMemoText.isEmpty) {
+      notifier.setAdviceError('핸드 상황을 입력해 주세요.');
+      return;
+    }
+
+    final stackSize = int.tryParse(gtoState.stackSizeInput.trim());
+    if (stackSize == null || stackSize < 1) {
+      notifier.setAdviceError('스택 사이즈를 BB 단위 숫자로 입력해 주세요.');
+      return;
+    }
+
+    final blindLevel = gtoState.blindLevelInput.trim();
+    if (blindLevel.isEmpty) {
+      notifier.setAdviceError('블라인드 레벨을 입력해 주세요.');
+      return;
+    }
+
+    notifier.setAdviceLoading(true);
+    try {
+      final advice = await GtoAdviceService().requestAdvice(
+        handMemoText: handMemoText,
+        position: gtoState.selectedPosition,
+        stackSize: stackSize,
+        blindLevel: blindLevel,
+      );
+      notifier.setAdviceResult(advice);
+    } catch (e) {
+      // CLAUDE.md 행동 지침: 모든 주요 외부 호출에 try-catch 필수
+      notifier.setAdviceError(e.toString().replaceFirst('Exception: ', ''));
+    }
+  }
+
+  /// 스택/블라인드 입력 필드 공통 데코레이션
+  InputDecoration _smallFieldDecoration({required String hint}) {
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+      filled: true,
+      fillColor: AppColors.surfaceVariant,
+      isDense: true,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide.none,
+      ),
+    );
   }
 }

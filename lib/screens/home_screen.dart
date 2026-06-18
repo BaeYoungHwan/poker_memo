@@ -5,6 +5,9 @@ import '../core/theme/app_colors.dart';
 import '../domain/hand_memo.dart';
 import '../providers/hand_memo_list_provider.dart';
 import 'add_hand_memo_screen.dart';
+import 'gto_range_screen.dart';
+import 'icm_calculator_screen.dart';
+import 'tournament_list_screen.dart';
 
 /// 핸드 메모 목록 홈 화면
 class HomeScreen extends ConsumerWidget {
@@ -15,7 +18,35 @@ class HomeScreen extends ConsumerWidget {
     final memosAsync = ref.watch(handMemoListProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('PokerMemo AI')),
+      appBar: AppBar(
+        title: const Text('PokerMemo AI'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.emoji_events_outlined),
+            tooltip: '토너먼트',
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const TournamentListScreen()),
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.calculate_outlined),
+            tooltip: 'ICM 계산기',
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const IcmCalculatorScreen()),
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.grid_on_outlined),
+            tooltip: 'GTO 핸드레인지',
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const GtoRangeScreen()),
+            ),
+          ),
+        ],
+      ),
       body: memosAsync.when(
         data: (memos) => memos.isEmpty
             ? _EmptyState()

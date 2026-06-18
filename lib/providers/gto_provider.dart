@@ -10,6 +10,8 @@ class GtoState {
   const GtoState({
     required this.selectedPosition,
     required this.handMemoInput,
+    required this.stackSizeInput,
+    required this.blindLevelInput,
     this.gtoAdviceResult,
     required this.isLoadingAdvice,
     this.errorMessage,
@@ -20,6 +22,12 @@ class GtoState {
 
   /// AI 조언 요청 시 전달할 핸드 상황 텍스트
   final String handMemoInput;
+
+  /// AI 조언 요청 시 전달할 스택 사이즈 입력 텍스트 (BB 단위, 숫자만 허용)
+  final String stackSizeInput;
+
+  /// AI 조언 요청 시 전달할 블라인드 레벨 입력 텍스트 (예: "500/1000")
+  final String blindLevelInput;
 
   /// AI(Cloud Function)로부터 받은 조언 결과 — null이면 아직 결과 없음
   final String? gtoAdviceResult;
@@ -35,6 +43,8 @@ class GtoState {
     return const GtoState(
       selectedPosition: PokerPosition.btn,
       handMemoInput: '',
+      stackSizeInput: '',
+      blindLevelInput: '',
       gtoAdviceResult: null,
       isLoadingAdvice: false,
       errorMessage: null,
@@ -48,6 +58,8 @@ class GtoState {
   GtoState copyWith({
     PokerPosition? selectedPosition,
     String? handMemoInput,
+    String? stackSizeInput,
+    String? blindLevelInput,
     Object? gtoAdviceResult = _sentinel,
     bool? isLoadingAdvice,
     Object? errorMessage = _sentinel,
@@ -55,6 +67,8 @@ class GtoState {
     return GtoState(
       selectedPosition: selectedPosition ?? this.selectedPosition,
       handMemoInput: handMemoInput ?? this.handMemoInput,
+      stackSizeInput: stackSizeInput ?? this.stackSizeInput,
+      blindLevelInput: blindLevelInput ?? this.blindLevelInput,
       gtoAdviceResult: gtoAdviceResult == _sentinel
           ? this.gtoAdviceResult
           : gtoAdviceResult as String?,
@@ -102,6 +116,16 @@ class GtoNotifier extends Notifier<GtoState> {
   /// AI 조언용 핸드 상황 입력 텍스트를 업데이트한다
   void updateHandMemoInput(String text) {
     state = state.copyWith(handMemoInput: text);
+  }
+
+  /// AI 조언용 스택 사이즈 입력 텍스트를 업데이트한다 (BB 단위)
+  void updateStackSizeInput(String text) {
+    state = state.copyWith(stackSizeInput: text);
+  }
+
+  /// AI 조언용 블라인드 레벨 입력 텍스트를 업데이트한다 (예: "500/1000")
+  void updateBlindLevelInput(String text) {
+    state = state.copyWith(blindLevelInput: text);
   }
 
   // ------------------------------------------------------------------

@@ -36,6 +36,7 @@ class HandMemo {
     required this.position,
     required this.noteText,
     required this.createdAt,
+    this.tournamentId,
   });
 
   final String id;
@@ -48,6 +49,9 @@ class HandMemo {
   final String noteText;
 
   final DateTime createdAt;
+
+  /// 이 핸드를 기록한 토너먼트 — null이면 특정 토너먼트와 연결되지 않은 메모
+  final String? tournamentId;
 
   /// Firestore 문서 → HandMemo 변환
   factory HandMemo.fromFirestore(DocumentSnapshot doc) {
@@ -62,6 +66,7 @@ class HandMemo {
       ),
       noteText: data['noteText'] as String? ?? '',
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      tournamentId: data['tournamentId'] as String?,
     );
   }
 
@@ -72,6 +77,7 @@ class HandMemo {
       'position': position.name,
       'noteText': noteText,
       'createdAt': Timestamp.fromDate(createdAt),
+      'tournamentId': tournamentId,
     };
   }
 
@@ -81,6 +87,7 @@ class HandMemo {
     PokerPosition? position,
     String? noteText,
     DateTime? createdAt,
+    String? tournamentId,
   }) {
     return HandMemo(
       id: id ?? this.id,
@@ -88,6 +95,7 @@ class HandMemo {
       position: position ?? this.position,
       noteText: noteText ?? this.noteText,
       createdAt: createdAt ?? this.createdAt,
+      tournamentId: tournamentId ?? this.tournamentId,
     );
   }
 }
