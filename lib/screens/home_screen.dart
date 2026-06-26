@@ -5,6 +5,7 @@ import '../core/theme/app_colors.dart';
 import '../domain/hand_memo.dart';
 import '../providers/hand_memo_list_provider.dart';
 import 'add_hand_memo_screen.dart';
+import 'hand_memo_detail_screen.dart';
 import 'gto_range_screen.dart';
 import 'icm_calculator_screen.dart';
 import 'tournament_list_screen.dart';
@@ -129,7 +130,15 @@ class _MemoList extends ConsumerWidget {
           ),
           onDismissed: (_) =>
               ref.read(handMemoListProvider.notifier).deleteMemo(memo.id),
-          child: _MemoCard(memo: memo),
+          child: GestureDetector(
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => HandMemoDetailScreen(memo: memo),
+              ),
+            ),
+            child: _MemoCard(memo: memo),
+          ),
         );
       },
     );

@@ -46,7 +46,11 @@
 ## P1 — MVP 핵심 기능
 
 ### Free Tier
-- [ ] 기본 오프라인 핸드 메모 기능 (포지션: SB/BB/UTG/HJ/CO/BTN 등 정확히 구분)
+- [x] 기본 오프라인 핸드 메모 기능 (포지션: SB/BB/UTG/HJ/CO/BTN 등 정확히 구분)
+      → 목록/작성/삭제(스와이프) + 상세 보기 + 편집 기능 구현 완료 (2026-06-27).
+      HandMemoDetailScreen (읽기모드: 포지션·날짜·토너먼트·메모 표시,
+      편집모드: 포지션/토너먼트/메모 수정 → Firestore 업데이트).
+      flutter analyze 0 issues, flutter test 48/48 pass
 - [x] 정적 데이터 기반 핸드레인지(Handrange) / 에퀴티(Equity) 조회
       → GTO 정적 레인지 테이블 6개 포지션 구현 완료 (BTN 44%, CO 22%, HJ 15%, UTG 11%)
 
