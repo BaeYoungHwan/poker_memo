@@ -81,3 +81,6 @@ export { gtoAdvice } from "./gtoAdvice";
 
 // scanPoster Cloud Function — 토너먼트 포스터 이미지 스캔 (poster_scan 태스크)
 export { scanPoster } from "./scanPoster";
+
+// weeklyReport Cloud Function — 주간 Leak 분석 리포트 (스케줄 + callable)
+export { weeklyReport, generateWeeklyReportForUser } from "./weeklyReport";

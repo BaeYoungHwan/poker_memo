@@ -75,7 +75,11 @@
       실기기/에뮬레이터 종단 검증(응답 확인 + `agent_execution_logs` 기록 확인)은
       사용자가 개발 더 진행한 후 직행 예정 — 보류
 - [ ] 개인 맞춤형 핸드레인지 설정 및 솔루션 제공
-- [ ] 누적 데이터 기반 유저 약점(Leak) 분석 → 주간 리포트 자동 발행 (+ 실행 로그 자동 기록)
+- [x] 누적 데이터 기반 유저 약점(Leak) 분석 → 주간 리포트 자동 발행 (+ 실행 로그 자동 기록)
+      → weeklyReport(스케줄: 매주 월 09:00 KST) + generateWeeklyReportForUser(callable) Cloud Functions 구현.
+      Flutter WeeklyReportScreen(빈 상태/리포트 카드/펼치기 + 리포트 생성 버튼) 완료.
+      HomeScreen AppBar 주간 리포트 아이콘 연결. flutter analyze 0 issues, flutter test 53/53 pass,
+      tsc --noEmit 0 errors (2026-06-27)
 
 ### AI 운영 자동화 (Free→유료 전환 퍼널)
 - [ ] Free 유저 행동 패턴 기반 Plus/Pro 전환 후보 감지 (규칙 기반 트리거: 메모 건수, 조회 패턴 등)
