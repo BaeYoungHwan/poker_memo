@@ -58,6 +58,16 @@ class HandMemoListNotifier extends StreamNotifier<List<HandMemo>> {
     }
   }
 
+  /// 핸드 메모 수정 — Firestore 스트림이 자동 갱신
+  Future<void> updateMemo(HandMemo memo) async {
+    try {
+      await ref.read(_handMemoServiceProvider).updateMemo(memo);
+    } catch (e) {
+      debugPrint('메모 수정 실패: $e');
+      rethrow;
+    }
+  }
+
   /// 핸드 메모 삭제 — Firestore 스트림이 자동 갱신
   Future<void> deleteMemo(String memoId) async {
     final uid = FirebaseAuth.instance.currentUser?.uid;

@@ -34,5 +34,12 @@ service cloud.firestore {
       allow read: if request.auth != null && request.auth.uid == resource.data.userId;
       allow write: if false;
     }
+
+    // 포스터 스캔 일일 호출 한도 카운터 — Cloud Functions(Admin SDK)만 기록, 클라이언트는 본인 카운터만 읽기 가능
+    // (users/{userId} 하위 와일드카드 규칙이 클라이언트 직접 쓰기를 허용해 한도 우회 가능한 문제를 이 구체적 규칙으로 차단)
+    match /users/{userId}/poster_scan_usage/{date} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if false;
+    }
   }
 }

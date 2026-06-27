@@ -46,7 +46,11 @@
 ## P1 — MVP 핵심 기능
 
 ### Free Tier
-- [ ] 기본 오프라인 핸드 메모 기능 (포지션: SB/BB/UTG/HJ/CO/BTN 등 정확히 구분)
+- [x] 기본 오프라인 핸드 메모 기능 (포지션: SB/BB/UTG/HJ/CO/BTN 등 정확히 구분)
+      → 목록/작성/삭제(스와이프) + 상세 보기 + 편집 기능 구현 완료 (2026-06-27).
+      HandMemoDetailScreen (읽기모드: 포지션·날짜·토너먼트·메모 표시,
+      편집모드: 포지션/토너먼트/메모 수정 → Firestore 업데이트).
+      flutter analyze 0 issues, flutter test 48/48 pass
 - [x] 정적 데이터 기반 핸드레인지(Handrange) / 에퀴티(Equity) 조회
       → GTO 정적 레인지 테이블 6개 포지션 구현 완료 (BTN 44%, CO 22%, HJ 15%, UTG 11%)
 
@@ -58,7 +62,11 @@
       핸드 메모는 `tournamentId`(nullable)로 토너먼트와 선택적 연결. HomeScreen AppBar에
       토너먼트/ICM/GTO 진입점 3개 함께 연결 (기존 ICM/GTO 라우팅 누락 해소).
       `flutter analyze`/`flutter test` 30/30 pass, 실기기 검증은 보류 (`phase3-tournament-detail.md` 참조)
-- [ ] 대회 포스터/정보 이미지 업로드 → AI 스캔 기능 (Vertex AI/Gemini)
+- [x] 대회 포스터/정보 이미지 업로드 → AI 스캔 기능 (Vertex AI/Gemini)
+      → scanPoster Cloud Function(Gemini Flash Vision, Base64 직접 전달 - Storage 미사용) +
+      Flutter AddTournamentScreen "포스터로 채우기" 통합 구현 완료 (2026-06-18).
+      `flutter analyze`/`flutter test` 48/48 pass, `tsc --noEmit` 0 errors,
+      실기기 검증은 보류 (`phase4-poster-scan.md` 참조)
 
 ### Pro Tier (핵심 AI 에이전트)
 - [🔄] LLM 기반 포커 AI 코칭
@@ -67,7 +75,11 @@
       실기기/에뮬레이터 종단 검증(응답 확인 + `agent_execution_logs` 기록 확인)은
       사용자가 개발 더 진행한 후 직행 예정 — 보류
 - [ ] 개인 맞춤형 핸드레인지 설정 및 솔루션 제공
-- [ ] 누적 데이터 기반 유저 약점(Leak) 분석 → 주간 리포트 자동 발행 (+ 실행 로그 자동 기록)
+- [x] 누적 데이터 기반 유저 약점(Leak) 분석 → 주간 리포트 자동 발행 (+ 실행 로그 자동 기록)
+      → weeklyReport(스케줄: 매주 월 09:00 KST) + generateWeeklyReportForUser(callable) Cloud Functions 구현.
+      Flutter WeeklyReportScreen(빈 상태/리포트 카드/펼치기 + 리포트 생성 버튼) 완료.
+      HomeScreen AppBar 주간 리포트 아이콘 연결. flutter analyze 0 issues, flutter test 53/53 pass,
+      tsc --noEmit 0 errors (2026-06-27)
 
 ### AI 운영 자동화 (Free→유료 전환 퍼널)
 - [ ] Free 유저 행동 패턴 기반 Plus/Pro 전환 후보 감지 (규칙 기반 트리거: 메모 건수, 조회 패턴 등)
@@ -75,9 +87,11 @@
 - [ ] 발송 단계 확장: AI 생성 → 검토 후 발송 → (베타 안정화 후) 자동 발송 (`agent_execution_logs` 기록)
 
 ### 매출 증빙
-- [ ] Stripe 결제 페이지 연동 (외부 결제 링크 방식)
-      — 정가/파운딩 멤버가 이원 구조 + KRW 로컬 가격 적용
-      (Plus $29.99→$14.99 / ₩39,900→₩19,900, Pro $99.99→$49.99 / ₩149,900→₩74,900)
+- [x] Stripe 결제 페이지 연동 (외부 결제 링크 방식)
+      → PricingScreen 구현 완료 (2026-06-27).
+      파운딩 멤버 특가 배너 + Plus($14.99/₩19,900) / Pro($49.99/₩74,900) 카드,
+      USD/KRW 각각 Stripe 외부 결제 링크 연결 (stripe_links.dart 상수 — 실제 URL 교체 필요).
+      HomeScreen AppBar 요금제 아이콘 추가. flutter analyze 0 issues, flutter test 56/56 pass
 
 ### 다국어
 - [ ] 영어/한국어 2개 국어 로컬라이징

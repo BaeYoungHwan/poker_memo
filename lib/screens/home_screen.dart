@@ -5,9 +5,12 @@ import '../core/theme/app_colors.dart';
 import '../domain/hand_memo.dart';
 import '../providers/hand_memo_list_provider.dart';
 import 'add_hand_memo_screen.dart';
+import 'hand_memo_detail_screen.dart';
 import 'gto_range_screen.dart';
 import 'icm_calculator_screen.dart';
 import 'tournament_list_screen.dart';
+import 'pricing_screen.dart';
+import 'weekly_report_screen.dart';
 
 /// 핸드 메모 목록 홈 화면
 class HomeScreen extends ConsumerWidget {
@@ -21,6 +24,22 @@ class HomeScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('PokerMemo AI'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.local_offer_outlined),
+            tooltip: '요금제',
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const PricingScreen()),
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.analytics_outlined),
+            tooltip: '주간 리포트',
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const WeeklyReportScreen()),
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.emoji_events_outlined),
             tooltip: '토너먼트',
@@ -129,7 +148,15 @@ class _MemoList extends ConsumerWidget {
           ),
           onDismissed: (_) =>
               ref.read(handMemoListProvider.notifier).deleteMemo(memo.id),
-          child: _MemoCard(memo: memo),
+          child: GestureDetector(
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => HandMemoDetailScreen(memo: memo),
+              ),
+            ),
+            child: _MemoCard(memo: memo),
+          ),
         );
       },
     );

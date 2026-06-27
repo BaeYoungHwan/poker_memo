@@ -39,6 +39,16 @@ class HandMemoService {
     });
   }
 
+  /// 핸드 메모 수정
+  Future<void> updateMemo(HandMemo memo) async {
+    try {
+      await _col(memo.userId).doc(memo.id).update(memo.toFirestore());
+    } catch (e) {
+      debugPrint('핸드 메모 수정 실패: $e');
+      rethrow;
+    }
+  }
+
   /// 핸드 메모 삭제
   Future<void> deleteMemo(String userId, String memoId) async {
     try {
