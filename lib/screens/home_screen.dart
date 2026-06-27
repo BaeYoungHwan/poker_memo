@@ -9,6 +9,7 @@ import 'hand_memo_detail_screen.dart';
 import 'gto_range_screen.dart';
 import 'icm_calculator_screen.dart';
 import 'tournament_list_screen.dart';
+import 'pricing_screen.dart';
 import 'weekly_report_screen.dart';
 
 /// 핸드 메모 목록 홈 화면
@@ -23,6 +24,14 @@ class HomeScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('PokerMemo AI'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.local_offer_outlined),
+            tooltip: '요금제',
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const PricingScreen()),
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.analytics_outlined),
             tooltip: '주간 리포트',

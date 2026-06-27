@@ -87,9 +87,11 @@
 - [ ] 발송 단계 확장: AI 생성 → 검토 후 발송 → (베타 안정화 후) 자동 발송 (`agent_execution_logs` 기록)
 
 ### 매출 증빙
-- [ ] Stripe 결제 페이지 연동 (외부 결제 링크 방식)
-      — 정가/파운딩 멤버가 이원 구조 + KRW 로컬 가격 적용
-      (Plus $29.99→$14.99 / ₩39,900→₩19,900, Pro $99.99→$49.99 / ₩149,900→₩74,900)
+- [x] Stripe 결제 페이지 연동 (외부 결제 링크 방식)
+      → PricingScreen 구현 완료 (2026-06-27).
+      파운딩 멤버 특가 배너 + Plus($14.99/₩19,900) / Pro($49.99/₩74,900) 카드,
+      USD/KRW 각각 Stripe 외부 결제 링크 연결 (stripe_links.dart 상수 — 실제 URL 교체 필요).
+      HomeScreen AppBar 요금제 아이콘 추가. flutter analyze 0 issues, flutter test 56/56 pass
 
 ### 다국어
 - [ ] 영어/한국어 2개 국어 로컬라이징
